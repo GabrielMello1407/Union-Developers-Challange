@@ -4,25 +4,31 @@ import UserData from './UserData';
 const Pages = () => {
   const resultsPerPage = 10;
   const apiUrl = 'https://randomuser.me/api/';
-  const totalPages = 10; // Total number of pages
+  const totalPages = 10;
 
   const [currentPage, setCurrentPage] = useState(1);
   const [data, setData] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [totalResults, setTotalResults] = useState(0);
 
   useEffect(() => {
-    fetchData(currentPage);
-  }, [currentPage]);
+    fetchData(currentPage, searchTerm);
+  }, [currentPage, searchTerm]);
 
-  const fetchData = async (page) => {
+  const fetchData = async (page, searchTerm) => {
     try {
       const response = await fetch(
-        `${apiUrl}?page=${page}&results=${resultsPerPage}&seed=abc${
-          searchTerm ? `&name=${searchTerm}` : ''
-        }`
+        `${apiUrl}?page=${page}&results=${resultsPerPage}&seed=abc`
       );
       const jsonData = await response.json();
-      setData(jsonData.results);
+      const filteredData = searchTerm
+        ? jsonData.results.filter(user =>
+            user.name.first.toLowerCase().includes(searchTerm.toLowerCase())
+          )
+        : jsonData.results;
+
+      setData(filteredData);
+      setTotalResults(searchTerm ? filteredData.length : totalPages * resultsPerPage);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -33,10 +39,13 @@ const Pages = () => {
   };
 
   const handleSearchChange = (event) => {
-    setSearchTerm(event.target.value);
+    const newSearchTerm = event.target.value;
+    setSearchTerm(newSearchTerm);
+    setCurrentPage(1);
   };
 
   return (
+    <div className='pages'>
       <div className='search-bar'>
         <input
           type='text'
@@ -44,8 +53,10 @@ const Pages = () => {
           value={searchTerm}
           onChange={handleSearchChange}
         />
-      <div className='pages'>
+      </div>
       <UserData data={data} />
+      <div className='pagination-info'>
+        <p>Displaying {data.length} of {totalResults} results</p>
       </div>
       <div className='btn-pages'>
         {Array.from({ length: totalPages }, (_, index) => (
