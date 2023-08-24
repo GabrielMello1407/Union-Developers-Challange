@@ -1,69 +1,60 @@
 import React, { useState, useEffect } from 'react';
 import UserData from './UserData';
+import { fetchUsers } from '../services/api';
 
 const Pages = () => {
-  const resultsPerPage = 10;
-  const apiUrl = 'https://randomuser.me/api/';
-  const totalPages = 10;
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const [data, setData] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [totalResults, setTotalResults] = useState(0);
+  const resultadosPorPagina = 10; // Número de usuários por página
+  const [dados, setDados] = useState([]);
+  const [termoDeBusca, setTermoDeBusca] = useState('');
+  const [paginaAtual, setPaginaAtual] = useState(1);
 
   useEffect(() => {
-    fetchData(currentPage, searchTerm);
-  }, [currentPage, searchTerm]);
-
-  const fetchData = async (page, searchTerm) => {
-    try {
-      const response = await fetch(
-        `${apiUrl}?page=${page}&results=${resultsPerPage}&seed=abc`
-      );
-      const jsonData = await response.json();
-      const filteredData = searchTerm
-        ? jsonData.results.filter(user =>
-            user.name.first.toLowerCase().includes(searchTerm.toLowerCase())
-          )
-        : jsonData.results;
-
-      setData(filteredData);
-      setTotalResults(searchTerm ? filteredData.length : totalPages * resultsPerPage);
-    } catch (error) {
-      console.error('Error fetching data:', error);
+    async function fetchData() {
+      const usuarios = await fetchUsers();
+      setDados(usuarios);
     }
+    fetchData();
+  }, []);
+
+  const buscarDados = async () => {
+    const usuariosFiltrados = dados.filter(
+      (user) =>
+        user.name.first.toLowerCase().includes(termoDeBusca.toLowerCase()) ||
+        user.name.last.toLowerCase().includes(termoDeBusca.toLowerCase())
+    );
+    return usuariosFiltrados;
   };
 
-  const handlePageClick = (page) => {
-    setCurrentPage(page);
+  const handlePageChange = (pageNumber) => {
+    setPaginaAtual(pageNumber);
   };
 
-  const handleSearchChange = (event) => {
-    const newSearchTerm = event.target.value;
-    setSearchTerm(newSearchTerm);
-    setCurrentPage(1);
-  };
+  useEffect(() => {
+    buscarDados().then((usuariosFiltrados) => {
+      const startIndex = (paginaAtual - 1) * resultadosPorPagina;
+      const endIndex = startIndex + resultadosPorPagina;
+      const usuariosPaginados = usuariosFiltrados.slice(startIndex, endIndex);
+      setDados(usuariosPaginados);
+    });
+  }, [paginaAtual, termoDeBusca]);
 
   return (
     <div className='pages'>
       <div className='search-bar'>
         <input
           type='text'
-          placeholder='Search by username...'
-          value={searchTerm}
-          onChange={handleSearchChange}
+          placeholder='Buscar por nome de usuário...'
+          value={termoDeBusca}
+          onChange={(event) => setTermoDeBusca(event.target.value)}
         />
       </div>
-      <UserData data={data} />
-      <div className='pagination-info'>
-        <p>Displaying {data.length} of {totalResults} results</p>
-      </div>
+      <UserData data={dados} />
       <div className='btn-pages'>
-        {Array.from({ length: totalPages }, (_, index) => (
+        {Array.from({ length: Math.ceil(dados.length / resultadosPorPagina) }, (_, index) => (
           <button
             key={index + 1}
-            onClick={() => handlePageClick(index + 1)}
-            disabled={currentPage === index + 1}
+            onClick={() => handlePageChange(index + 1)}
+            disabled={paginaAtual === index + 1}
           >
             {index + 1}
           </button>

@@ -1,22 +1,39 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
-//resgatando os dados do usuario para a listagem
 const UserData = ({ data }) => {
   return (
     <div className='user-list'>
-      <ul>
-        {data.map((user, index) => (
-          <li key={index}>
-            <strong>ID:</strong> {user.login.uuid} <br />
-            <strong>First Name:</strong> {user.name.first} <br />
-            <strong>Last Name:</strong> {user.name.last} <br />
-            <strong>Title:</strong> {user.name.title} <br />
-            <strong>Date:</strong> {user.dob.date.substring(0, 10)} <br />
-            <strong>Age:</strong> {user.dob.age} <br />
-            <button>View Profile</button>
-          </li>
-        ))}
-      </ul>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Title</th>
+            <th>Date</th>
+            <th>Age</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((user, index) => (
+            <tr key={index}>
+              <td>{user.login.uuid}</td>
+              <td>{user.name.first}</td>
+              <td>{user.name.last}</td>
+              <td>{user.name.title}</td>
+              <td>{user.dob.date.substring(0, 10).replace(/-/g, '/')}</td>
+              <td>{user.dob.age}</td>
+              <td>
+                <Link to={`/profile/${user.login.uuid}`}>
+                  <button>View Profile</button>
+                </Link>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };
