@@ -1,21 +1,23 @@
+// Importações das bibliotecas e componentes necessários
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Info from '../components/Profile/Info';
 import Location from '../components/Profile/Location';
 import Login from '../components/Profile/Login';
 import { fetchUsers } from '../services/api';
+import '../styles/styles.scss';
 
 const Profile = () => {
   const { userId } = useParams();
   const navigate = useNavigate();
 
   const [userProfile, setUserProfile] = useState(null);
-  const [currentSection, setCurrentSection] = useState('info'); // Estado para controlar a seção atual
+  const [currentSection, setCurrentSection] = useState('info');
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const users = await fetchUsers({ resultsPerPage: 100 }); // Fetch all users
+        const users = await fetchUsers({ resultsPerPage: 100 });
         const foundUser = users.find((user) => user.login.uuid === userId);
 
         if (foundUser) {
@@ -33,7 +35,7 @@ const Profile = () => {
   }, [userId, navigate]);
 
   const handleSectionChange = (section) => {
-    setCurrentSection(section); // Atualiza o estado para a seção clicada
+    setCurrentSection(section);
   };
 
   const handleBack = () => {
@@ -46,26 +48,44 @@ const Profile = () => {
 
   return (
     <div className='profile-page'>
+      <div className="full-width-container">
       <div className='back-button'>
         <button onClick={handleBack}>Back</button>
       </div>
-      <h2>Profile</h2>
       <div className='user-info'>
         <img
           src={userProfile.picture.large}
           alt={`${userProfile.name.title} ${userProfile.name.first} ${userProfile.name.last}`}
         />
-        <p>{`${userProfile.name.title} ${userProfile.name.first} ${userProfile.name.last}`}</p>
+        <h2>{`${userProfile.name.first} ${userProfile.name.last}`}</h2>
+        <p>{userProfile.name.title}</p>
       </div>
-      <div>
-        <button onClick={() => handleSectionChange('info')}>Info</button>
-        <button onClick={() => handleSectionChange('location')}>Location</button>
-        <button onClick={() => handleSectionChange('login')}>Login</button>
+      </div> {/* Adicione esta linha */}
+      <div className='button-section'>
+        <button
+          onClick={() => handleSectionChange('info')}
+          className={currentSection === 'info' ? 'active' : ''}
+        >
+          Info
+        </button>
+        <button
+          onClick={() => handleSectionChange('location')}
+          className={currentSection === 'location' ? 'active' : ''}
+        >
+          Location
+        </button>
+        <button
+          onClick={() => handleSectionChange('login')}
+          className={currentSection === 'login' ? 'active' : ''}
+        >
+          Login
+        </button>
       </div>
-      {/* Renderiza a seção atual com base no estado currentSection */}
-      {currentSection === 'info' && <Info user={userProfile} />}
-      {currentSection === 'location' && <Location user={userProfile} />}
-      {currentSection === 'login' && <Login user={userProfile} />}
+      <div className='info-section'>
+        {currentSection === 'info' && <Info user={userProfile} />}
+        {currentSection === 'location' && <Location user={userProfile} />}
+        {currentSection === 'login' && <Login user={userProfile} />}
+      </div>
     </div>
   );
 };
