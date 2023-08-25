@@ -1,5 +1,20 @@
-import '../../styles/styles.scss'; // Importa os estilos SCSS
-const Login = ({ user }) => {
+import React from 'react';
+
+interface UserLogin {
+  username: string;
+  password: string;
+}
+
+interface UserProfile {
+  email: string;
+  login: UserLogin;
+}
+
+interface LoginProps {
+  user: UserProfile;
+}
+
+const Login: React.FC<LoginProps> = ({ user }) => {
   return (
     <div className='info'>
       <div className="info-box"><strong><p>Email</p></strong><span className="info-content">{user.email}</span></div>

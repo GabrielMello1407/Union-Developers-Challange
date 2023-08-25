@@ -1,7 +1,25 @@
+import React from 'react';
 
-import '../../styles/styles.scss'; // Importa os estilos SCSS
+interface Name {
+  title: string;
+  first: string;
+  last: string;
+}
 
-const Info = ({ user }) => {
+interface Dob {
+  age: number;
+}
+
+interface UserInfo {
+  name: Name;
+  dob: Dob;
+}
+
+interface InfoProps {
+  user: UserInfo;
+}
+
+const Info: React.FC<InfoProps> = ({ user }) => {
   return (
     <div className='info'>
       <div className='info-box'>
@@ -12,9 +30,6 @@ const Info = ({ user }) => {
       </div>
       <div className='info-box'>
         <strong><p>Title</p></strong> <span className="info-content">{user.name.title}</span>
-      </div>
-      <div className='info-box'>
-        <strong><p>Gender</p></strong> <span className="info-content">{user.gender}</span>
       </div>
       <div className='info-box'>
         <strong><p>Age</p></strong> <span className="info-content">{user.dob.age}</span>

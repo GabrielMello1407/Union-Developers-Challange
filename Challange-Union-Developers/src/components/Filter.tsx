@@ -1,9 +1,13 @@
-import React from 'react';
-import '../styles/styles.scss'; // Importação do arquivo de estilos
+import React from 'react'; // Importa o React
+import '../styles/styles.scss'; // Importa o arquivo de estilos
 
-const Filter = ({ onFilterChange }) => {
+interface FilterProps {
+  onFilterChange: (value: string) => void;
+}
+
+const Filter: React.FC<FilterProps> = ({ onFilterChange }) => {
   // Função para lidar com a mudança no input de filtro
-  const handleInputChange = (event) => {
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     onFilterChange(value); // Chama a função de filtro passada como prop
   };

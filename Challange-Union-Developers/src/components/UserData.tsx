@@ -1,8 +1,27 @@
-import React from 'react';
+import React from 'react'; // Importa o React
 import { Link } from 'react-router-dom';
-import '../styles/styles.scss'; // Importação do arquivo de estilos
+import '../styles/styles.scss'; // Importa o arquivo de estilos
 
-const UserData = ({ data }) => {
+interface User {
+  login: {
+    uuid: string;
+  };
+  name: {
+    first: string;
+    last: string;
+    title: string;
+  };
+  dob: {
+    date: string;
+    age: number;
+  };
+}
+
+interface UserDataProps {
+  data: User[];
+}
+
+const UserData: React.FC<UserDataProps> = ({ data }) => {
   return (
     <div className='user-list'>
       {/* Tabela para exibir dados dos usuários */}
